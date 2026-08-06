@@ -1,12 +1,12 @@
 {
   "name": "goofansu-skills",
   "description": "Yejun Su's skills as a Claude Code plugin.",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "author": {
     "name": "Yejun Su"
   },
-  "skills": {
+  "skills": [
     "./skills/engineering/commit",
     "./skills/engineering/verify"
-  }
+  ]
 }
