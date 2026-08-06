@@ -1,0 +1,14 @@
+{
+  "name": "goofansu",
+  "description": "Yejun Su's skills as a Claude Code plugin.",
+  "owner": {
+    "name": "Yejun Su",
+    "email": "goofan.su@gmail.com"
+  },
+  "plugins": [
+    {
+      "name": "goofansu-skills",
+      "source": "./"
+    }
+  ]
+}
