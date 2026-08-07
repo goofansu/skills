@@ -1,11 +1,7 @@
 ---
 name: commit
-description: Use when creating a git commit.
+description: Create a git commit using Conventional Commits format. Use when creating a git commit.
 ---
-
-Create a git commit using Conventional Commits format.
-
-## Steps
 
 1. Infer from the prompt whether the user provided file paths, globs, or additional instructions.
 2. Review `git status --short` and `git diff` to understand the current changes. Limit inspection to the provided file paths or globs when present.
