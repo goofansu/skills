@@ -1,130 +1,97 @@
 ---
 name: timetable-card
-description: Generate a compact, printable HTML timetable card from a school schedule image. Produces 3 identical cut-out cards on one A4 page — sized to fit in a pencil box. Use this skill whenever the user provides a school timetable photo/image and wants to print a small card version, make a pocket schedule, create a pencil-box card, or print multiple copies of a class timetable on one sheet.
+description: Generate two readable, cut-out timetable cards on one printable A4 page from a school schedule image.
 disable-model-invocation: true
 ---
 
-# Timetable Card Skill
+# Timetable Card
 
-Turn a school timetable photo into a **print-ready A4 HTML file** containing **3 identical pocket-sized cards** — one cut line each, ready to slip into a pencil box or folder.
+Turn a school timetable image into a print-ready A4 HTML file containing **2 identical, comfortably spaced cards** separated by a cut line.
 
-## What the output looks like
+## Step 1 — Extract the timetable
 
-- **3 stacked cards** on one A4 page, separated by a dashed cut line
-- Each card is **~9 cm wide × ~8.5 cm tall** — pencil-box size
-- Shows **weekdays only** (周一–周五 or Mon–Fri)
-- Shows **subject names only** — no teacher names
-- **Color-coded subjects** for quick scanning
-- Break / activity rows shown as slim tinted rows
-- Works for both Chinese and English timetables
+Read the image carefully and capture:
 
----
+1. **Class name and term** for the card header.
+2. **Period rows**, including the period label, time, full subject name, and teacher when explicitly assigned in the source.
+3. **Break and activity rows** with their labels and times.
+4. **After-school rows** that belong on the timetable.
 
-## Step 1 — Read and extract the timetable
+Apply these transcription rules:
 
-Read the provided image carefully. Extract:
+- Render the **full subject name above the teacher name**.
+- Omit the teacher line when the source does not explicitly assign one; do not infer it from another occurrence of the subject.
+- Preserve a teacher-only cell as a teacher name without inventing a subject.
+- Render an empty cell as `—`.
+- Confirm uncertain handwriting with the user before finalizing.
 
-1. **Class name & term** (e.g. 五(4)班, 2025学年度第二学期) — shown in card header
-2. **Period rows** — for each period capture:
-   - Period label (第一节 / Period 1 / etc.)
-   - Time range (e.g. 8:20–9:00)
-   - Subject for each weekday — **strip teacher names entirely**
-3. **Break / activity rows** between periods (课间大活动, 眼保健操, 午间活动, etc.) — keep these as slim rows showing label + time, they help the child orient themselves in the day
-4. **After-school rows** if present (课后服务, etc.)
+Completion criterion: every visible row and weekday cell is accounted for, including handwritten additions and user corrections.
 
-If a cell is empty or has a dash, render it as `—`.
+## Step 2 — Fit full names legibly
 
-> Why strip teacher names? The card is meant to be a quick at-a-glance reference for the student. Teacher names add clutter without helping the child know what lesson is next.
+Keep full subject names. Use the template's `.long` or `.xlong` course classes for unusually long labels rather than abbreviating them. Abbreviate only when the user requests it or the full label remains unreadable at the template's minimum long-label size.
 
----
+Wrap each ordinary cell like this:
 
-## Step 2 — Abbreviate long subject names
+```html
+<td class="subj">
+  <span class="course subj-2">数学</span>
+  <span class="teacher">张仲炎</span>
+</td>
+```
 
-Long subject names must be shortened to fit the compact cell. Use judgment — abbreviate only when clearly unambiguous:
+For a subject with no stated teacher, omit the teacher span. For a teacher-only cell:
 
-| Full name | Abbreviation |
-|---|---|
-| 体育与健康 | 体育 |
-| 道德与法治 | 道法 |
-| 艺术（音乐）| 音乐 |
-| 艺术（美术）| 美术 |
-| 综合实践活动 | 综合实践 |
-| 兴趣活动1/2 | 兴趣1 / 兴趣2 |
-| Physical Education | PE |
-| Religious Education | RE |
-
-For English timetables, apply the same principle — shorten to what students actually call the subject.
-
----
+```html
+<td class="subj teacher-only">张仲炎</td>
+```
 
 ## Step 3 — Generate the HTML
 
-Use the template in `references/card-template.md` as your starting point. Key rules:
+Start from [`references/card-template.md`](references/card-template.md) and replace its placeholder timetable rows.
 
-### Layout & print
-- **Page**: A4 portrait, 8 mm margins (`@page { size: A4 portrait; margin: 8mm }`)
-- **3 cards** stacked vertically in `.sheet`, separated by `.cut-line` divs
-- Each card: `width: 9cm`, no fixed height (let content flow naturally)
-- Force backgrounds and colors in print: `* { -webkit-print-color-adjust: exact; print-color-adjust: exact; }`
-- Each card: `page-break-inside: avoid; break-inside: avoid`
+### Layout and print
 
-### Table
-- `border-collapse: collapse`, all borders `1px solid #999` (not thinner — they disappear in print)
-- Header row: dark navy background `#1a3a6b` with white text, `!important` so print doesn't strip it
-- Period label cells: light blue tint `#e8eef8 !important`
-- Break rows: warm cream tint `#f0ece0 !important`, italic, slim (`height: 12px`, `padding: 2px`)
-- Subject cells: `font-size: 7pt`, `font-weight: 500`
-- Period label column: `font-size: 6pt`, time sub-label `5.5pt` in a `<span class="time">`
+- A4 portrait with 8 mm page margins.
+- **2 cards** stacked vertically with one dashed cut line between them.
+- Each card and `.sheet` are **13 cm wide**.
+- Cards have natural height, `page-break-inside: avoid`, and `break-inside: avoid`.
+- Use exact print colors via `-webkit-print-color-adjust: exact` and `print-color-adjust: exact`.
+- Render the two cards from one `<template>` so their content stays identical.
 
-### Subject color coding
-Pick readable, distinct colors. Suggested palette for Chinese primary subjects:
+### Readability
+
+- Table borders: `1px solid #999` with `border-collapse: collapse`.
+- Header: 9 pt, navy `#1a3a6b`, white text.
+- Subject: 8 pt; long labels 7.5 pt; extra-long labels 7 pt.
+- Teacher: 6.3 pt with visible spacing beneath the subject.
+- Period label: 7.5 pt; time: 6.5 pt.
+- Break row: 7 pt, warm cream `#f0ece0`, 16 px minimum height.
+- Use comfortable cell padding; preserve clear separation between subject and teacher.
+
+### Subject colors
+
+Assign readable, consistent colors by subject category. Apply the color class to the `.course` span, leaving teacher names neutral. Suggested palette:
 
 ```css
-.语文  { color: #c0392b; }   /* red */
-.数学  { color: #1a5276; }   /* dark blue */
-.外语  { color: #1e8449; }   /* green */
-.体育  { color: #6c3483; }   /* purple */
-.道法  { color: #784212; }   /* brown */
-.音乐  { color: #1a6b5a; }   /* teal */
-.美术  { color: #b7770d; }   /* amber */
-.科学  { color: #117a65; }   /* dark teal */
-.写字  { color: #555;    }   /* grey */
-.劳动  { color: #7d6608; }   /* olive */
-.班会  { color: #922b21; }   /* deep red */
-.综合  { color: #1b4f72; }   /* navy */
-.兴趣  { color: #5b2c6f; }   /* violet */
+.语文 { color: #c0392b; }
+.数学 { color: #1a5276; }
+.英语 { color: #1e8449; }
+.体育 { color: #6c3483; }
+.道法 { color: #784212; }
+.音乐 { color: #1a6b5a; }
+.美术 { color: #b7770d; }
+.科学 { color: #117a65; }
+.信息 { color: #2471a3; }
+.劳动 { color: #7d6608; }
+.综合 { color: #1b4f72; }
 ```
 
-For English timetables, assign similar distinct colors to each subject.
+For English timetables, assign equivalent distinct classes such as `.maths`, `.english`, and `.science`.
 
-Apply the color class to a `<span>` wrapping the subject text inside the `<td>`.
+## Step 4 — Verify, save, and open
 
-### Cut line between cards
-```html
-<div class="cut-line">✂︎ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
-```
-```css
-.cut-line {
-  border-top: 1px dashed #aaa;
-  color: #aaa;
-  font-size: 8pt;
-  text-align: left;
-  margin: 3mm 0;
-  padding-top: 1px;
-}
-```
-
----
-
-## Step 4 — Save and open
-
-- Save the HTML file **in the same directory as the source image**, named after the class:
-  e.g. `5b-card.html`, `3a-card.html`, `year4-card.html`
-- Run `open <filename>` so the user can immediately preview and print
-- Tell the user: **File → Print → "No margins" or set to 8mm → Print**
-
----
-
-## Reference
-
-- `references/card-template.md` — Full boilerplate HTML to copy and adapt (saves time, ensures correct print CSS)
+1. Save beside the source image, named after the class, such as `6-5-card.html`, `5b-card.html`, or `year4-card.html`.
+2. Render or print-preview the HTML and verify that both complete cards fit on **one A4 page** without clipping or overflow. Tighten spacing slightly if needed while preserving readable type.
+3. Run `open <filename>` for immediate preview.
+4. Tell the user: **File → Print → use the document's 8 mm page margins → Print**.
