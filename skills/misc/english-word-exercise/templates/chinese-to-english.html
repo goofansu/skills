@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>中译英练习</title>
+  <style>
+    @page { size: A4 portrait; margin: 10mm 11mm; }
+    * { box-sizing: border-box; }
+    html { background: #ececec; }
+    body {
+      width: 188mm;
+      min-height: 277mm;
+      margin: 8mm auto;
+      color: #111;
+      background: #fff;
+      font-family: "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif;
+      font-size: 9.5pt;
+      line-height: 1.15;
+    }
+    header {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: end;
+      margin-bottom: 2.5mm;
+      padding-bottom: 1.7mm;
+      border-bottom: 0.35mm solid #111;
+    }
+    h1 { margin: 0; font-size: 16pt; line-height: 1; }
+    .direction { font-weight: 700; font-size: 9pt; }
+    .details { display: flex; gap: 8mm; margin-bottom: 2mm; font-size: 8.5pt; }
+    .details span { flex: 1; padding-bottom: 0.5mm; border-bottom: 0.25mm solid #333; }
+    h2 {
+      margin: 2mm 0 0.8mm;
+      font-size: 10pt;
+      line-height: 1.15;
+      letter-spacing: 0.08em;
+      break-after: avoid;
+    }
+    section + section h2 { margin-top: 8mm; }
+    ol { margin: 0; padding: 0; list-style: none; }
+    li {
+      display: grid;
+      grid-template-columns: 7mm max-content minmax(20mm, 1fr);
+      column-gap: 0;
+      align-items: end;
+      min-height: 9mm;
+      break-inside: avoid;
+    }
+    .num { padding: 0 2mm 0.55mm 0; text-align: right; color: #333; }
+    .prompt { padding: 0 1.5mm 0.55mm 0; white-space: nowrap; }
+    .answer { height: 8mm; border-bottom: 0.25mm solid #111; }
+    .compact .prompt { font-size: 9pt; }
+    @media screen { body { padding: 10mm 11mm; box-shadow: 0 1mm 5mm #aaa; } }
+    @media print {
+      html, body { background: #fff; }
+      body { width: auto; min-height: auto; margin: 0; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1 id="lesson-title"></h1>
+    <div class="direction">中译英</div>
+  </header>
+  <div class="details"><span>姓名：</span><span>日期：</span></div>
+  <main id="worksheet"></main>
+
+  <script>
+    const SHEET = {
+      title: "LESSON TITLE",
+      sections: [
+        { heading: "一、词组", rows: [
+          ["1.", "第一个中文提示"],
+          ["2.", "第二个中文提示"]
+        ]},
+        { heading: "二、词形转换", compact: true, rows: [
+          ["1.", "词义（名词）→ 相关词义（名词）"]
+        ]}
+      ]
+    };
+
+    document.title = `${SHEET.title} — 中译英`;
+    document.getElementById("lesson-title").textContent = SHEET.title;
+    const worksheet = document.getElementById("worksheet");
+
+    for (const group of SHEET.sections) {
+      const section = document.createElement("section");
+      const heading = document.createElement("h2");
+      heading.textContent = group.heading;
+      const list = document.createElement("ol");
+      if (group.compact) list.className = "compact";
+
+      for (const [number, prompt] of group.rows) {
+        const row = document.createElement("li");
+        for (const [className, text] of [["num", number], ["prompt", prompt], ["answer", ""]]) {
+          const span = document.createElement("span");
+          span.className = className;
+          span.textContent = text;
+          row.appendChild(span);
+        }
+        list.appendChild(row);
+      }
+
+      section.append(heading, list);
+      worksheet.appendChild(section);
+    }
+  </script>
+</body>
+</html>
