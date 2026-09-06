@@ -28,11 +28,11 @@ Ticket agents run unfocused, so the user keeps their pane and every ticket on th
    - Start a ticket agent for each frontier ticket not yet started, all of them at once. Each gets a worktree cut from the current tip of the integration branch. Cutting from the current tip is what carries a blocker's merged work into the ticket that depends on it.
    - Every prompt starts with `/implement-and-review`, then the ticket and pointers to the spec and the exploration notes: `/implement-and-review <ticket> against <spec>, notes in <notes-dir>`.
    - Wait on the agents. A settled agent has stopped, which is a signal to look rather than proof of success: it may have ended clean, or stopped on a spec gap or a review stalemate. Read its final report, and answer or surface anything it is blocked on.
-   - As each ticket finishes green, merge its branch into the integration branch and remove its worktree. Merge one at a time; the other ticket agents keep running.
+   - As each ticket finishes green, merge its branch into the integration branch, then remove its worktree and delete the ticket branch. Merge one at a time; the other ticket agents keep running.
    - Every merge grows the frontier. Start the newly-ready tickets straight away rather than waiting for the rest of the round.
 
 5. When a ticket agent fails, or its work will not merge, stop that part of the graph: report it, leave the tickets it blocks unstarted, and keep working the rest of the frontier.
 
 6. Once all tickets are complete, run /code-review on the integration branch. Fix everything it raises with a single pi agent started on the integration branch.
 
-7. Report every ticket and whether it merged, plus anything left unstarted and why. Leave the integration branch and no worktrees behind.
+7. Report every ticket and whether it merged, plus anything left unstarted and why. Leave the integration branch, and no ticket branches or worktrees behind.
