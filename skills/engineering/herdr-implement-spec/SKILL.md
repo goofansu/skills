@@ -22,7 +22,7 @@ Ticket agents run unfocused, so the user keeps their pane and every ticket on th
 
 2. (optional) Use an **exploration subagent** to conduct any exploration required by the tickets - relevant codebase files or external documentation. Ensure the exploration subagent can save files - it should save its markdown notes in a directory outside the repo, so every ticket agent can be pointed at them. This lets ticket agents focus on implementation rather than exploration.
 
-3. Create the **integration branch** off main. Every ticket's work lands here.
+3. Create the **integration branch** off main in a dedicated **integration worktree** (`git worktree add -b <integration-branch> <integration-worktree> main`). Keep the current workspace's branch and working tree unchanged. Every ticket's work lands in the integration worktree; run integration merges and checks there.
 
 4. Work the frontier until every ticket is merged:
    - Start a ticket agent for each frontier ticket not yet started, all of them at once. Each gets a worktree cut from the current tip of the integration branch. Cutting from the current tip is what carries a blocker's merged work into the ticket that depends on it.
@@ -33,6 +33,6 @@ Ticket agents run unfocused, so the user keeps their pane and every ticket on th
 
 5. When a ticket agent fails, or its work will not merge, stop that part of the graph: report it, leave the tickets it blocks unstarted, and keep working the rest of the frontier.
 
-6. Once all tickets are complete, run /code-review on the integration branch. Fix everything it raises with a single pi agent started on the integration branch.
+6. Once all tickets are complete, run /code-review in the integration worktree. Fix everything it raises with a single pi agent started in that worktree.
 
-7. Report every ticket and whether it merged, plus anything left unstarted and why. Leave the integration branch, and no ticket branches or worktrees behind.
+7. Report every ticket and whether it merged, plus anything left unstarted and why. Leave the integration branch and its worktree ready for review, and report their name and path. Leave no ticket branches or worktrees behind.
