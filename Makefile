@@ -3,6 +3,7 @@ install:
 	npx skills add ./skills/engineering -a codex -g -y
 	npx skills add mattpocock/skills/skills/engineering -a codex -g -y
 	npx skills add mattpocock/skills/skills/productivity -a codex -g -y
+	npx skills add boldsoftware/exe.dev -s using-exe-dev -a codex -g -y
 	# .claude/skills
 	npx skills add goofansu/pi-subagent -s herdr-implement-spec -a claude-code -g -y
 	# .agents/skills + .claude/skills
